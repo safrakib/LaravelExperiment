@@ -7,6 +7,9 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Mail\Markdown;
 use Illuminate\Support\Traits\Conditionable;
+use Symfony\Component\Mailer\Header\MetadataHeader;
+use Symfony\Component\Mailer\Header\TagHeader;
+use Symfony\Component\Mime\Email;
 
 class MailMessage extends SimpleMessage implements Renderable
 {
@@ -254,6 +257,33 @@ class MailMessage extends SimpleMessage implements Renderable
     }
 
     /**
+     * Add a tag header to the message when supported by the underlying transport.
+     *
+     * @param  string  $value
+     * @return $this
+     */
+    public function tag($value)
+    {
+        return $this->withSymfonyMessage(function (Email $message) use ($value) {
+            $message->getHeaders()->add(new TagHeader($value));
+        });
+    }
+
+    /**
+     * Add a metadata header to the message when supported by the underlying transport.
+     *
+     * @param  string  $key
+     * @param  string  $value
+     * @return $this
+     */
+    public function metadata($key, $value)
+    {
+        return $this->withSymfonyMessage(function (Email $message) use ($key, $value) {
+            $message->getHeaders()->add(new MetadataHeader($key, $value));
+        });
+    }
+
+    /**
      * Set the priority of this message.
      *
      * The value is an integer where 1 is the highest priority and 5 is the lowest.
@@ -322,12 +352,12 @@ class MailMessage extends SimpleMessage implements Renderable
     }
 
     /**
-     * Register a callback to be called with the Swift message instance.
+     * Register a callback to be called with the Symfony message instance.
      *
      * @param  callable  $callback
      * @return $this
      */
-    public function withSwiftMessage($callback)
+    public function withSymfonyMessage($callback)
     {
         $this->callbacks[] = $callback;
 

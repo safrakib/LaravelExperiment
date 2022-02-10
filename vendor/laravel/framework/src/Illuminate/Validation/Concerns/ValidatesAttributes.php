@@ -7,10 +7,10 @@ use DateTime;
 use DateTimeInterface;
 use Egulias\EmailValidator\EmailValidator;
 use Egulias\EmailValidator\Validation\DNSCheckValidation;
+use Egulias\EmailValidator\Validation\Extra\SpoofCheckValidation;
 use Egulias\EmailValidator\Validation\MultipleValidationWithAnd;
 use Egulias\EmailValidator\Validation\NoRFCWarningsValidation;
 use Egulias\EmailValidator\Validation\RFCValidation;
-use Egulias\EmailValidator\Validation\SpoofCheckValidation;
 use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
@@ -372,6 +372,29 @@ trait ValidatesAttributes
     }
 
     /**
+     * Validate that an array has all of the given keys.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  array  $parameters
+     * @return bool
+     */
+    public function validateRequiredArrayKeys($attribute, $value, $parameters)
+    {
+        if (! is_array($value)) {
+            return false;
+        }
+
+        foreach ($parameters as $param) {
+            if (! Arr::exists($value, $param)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
      * Validate the size of an attribute is between a set of values.
      *
      * @param  string  $attribute
@@ -449,7 +472,11 @@ trait ValidatesAttributes
             return true;
         }
 
-        if ((! is_string($value) && ! is_numeric($value)) || strtotime($value) === false) {
+        try {
+            if ((! is_string($value) && ! is_numeric($value)) || strtotime($value) === false) {
+                return false;
+            }
+        } catch (Exception $e) {
             return false;
         }
 
@@ -890,15 +917,15 @@ trait ValidatesAttributes
      */
     public function parseTable($table)
     {
-        [$connection, $table] = Str::contains($table, '.') ? explode('.', $table, 2) : [null, $table];
+        [$connection, $table] = str_contains($table, '.') ? explode('.', $table, 2) : [null, $table];
 
-        if (Str::contains($table, '\\') && class_exists($table) && is_a($table, Model::class, true)) {
+        if (str_contains($table, '\\') && class_exists($table) && is_a($table, Model::class, true)) {
             $model = new $table;
 
             $table = $model->getTable();
             $connection = $connection ?? $model->getConnectionName();
 
-            if (Str::contains($table, '.') && Str::startsWith($table, $connection)) {
+            if (str_contains($table, '.') && Str::startsWith($table, $connection)) {
                 $connection = null;
             }
 
@@ -1429,19 +1456,6 @@ trait ValidatesAttributes
     }
 
     /**
-     * Validate that the password of the currently authenticated user matches the given value.
-     *
-     * @param  string  $attribute
-     * @param  mixed  $value
-     * @param  array  $parameters
-     * @return bool
-     */
-    protected function validatePassword($attribute, $value, $parameters)
-    {
-        return $this->validateCurrentPassword($attribute, $value, $parameters);
-    }
-
-    /**
      * Validate that an attribute exists even if not filled.
      *
      * @param  string  $attribute
@@ -1543,7 +1557,6 @@ trait ValidatesAttributes
      *
      * @param  string  $attribute
      * @param  mixed  $value
-     * @param  mixed  $parameters
      * @return bool
      */
     public function validateProhibited($attribute, $value)
@@ -2060,20 +2073,14 @@ trait ValidatesAttributes
      */
     protected function compare($first, $second, $operator)
     {
-        switch ($operator) {
-            case '<':
-                return $first < $second;
-            case '>':
-                return $first > $second;
-            case '<=':
-                return $first <= $second;
-            case '>=':
-                return $first >= $second;
-            case '=':
-                return $first == $second;
-            default:
-                throw new InvalidArgumentException;
-        }
+        return match ($operator) {
+            '<' => $first < $second,
+            '>' => $first > $second,
+            '<=' => $first <= $second,
+            '>=' => $first >= $second,
+            '=' => $first == $second,
+            default => throw new InvalidArgumentException,
+        };
     }
 
     /**
