@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserAuth;
+use App\Jobs\SmsSender;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -14,7 +15,16 @@ use App\Http\Controllers\UserAuth;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    //return view('welcome');
+
+    $data['recipient'] = "8801962702977";
+    $data['message'] = "Queue Working SMS";
+    $data['from'] = 'DLITS';
+
+    SmsSender::dispatch($data);
+
+    echo "Sms Send";
+
 });
 
 Route::get('registration',[UserAuth::class,'registration']);
