@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Senders;
+
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\DB;
 
@@ -16,37 +17,18 @@ class psl
         $mainArray = array();
         $numbers = "";
         $success_count = 0;
-        for ($i = 0; $i < count($messageData['recipient']); $i++) {
 
-            $numbers = $messageData['recipient'][$i];
+        $numbers = $messageData['recipient'];
 
-            $add_urlsData = "?username=" . $getwayDetails->sg_user . "&password=" . $getwayDetails->sg_password . "&recipient=" . $numbers . "&from=" . $messageData['from'] . "&message=" . urlencode($messageData['message']);
-            $url = $getwayDetails->sg_access_url . $add_urlsData;
+        $add_urlsData = "?username=" . $getwayDetails->sg_user . "&password=" . $getwayDetails->sg_password . "&recipient=" . $numbers . "&from=" . $messageData['from'] . "&message=" . urlencode($messageData['message']);
+        $url = $getwayDetails->sg_access_url . $add_urlsData;
 
-            $response = Http::get($url);
-            $response = json_decode($response->body(), true);
-
-            if ($response['status'] == 'success') {
-                $success_count += 1;
-                $deliveryStatus['number'] = $numbers;
-                $deliveryStatus['status'] = 'delivered';
-                array_push($mainArray, $deliveryStatus);
-            } elseif ($response['status'] == false) {
-                $deliveryStatus['number'] = $numbers;
-                $deliveryStatus['status'] = 'rejected';
-                array_push($mainArray, $deliveryStatus);
-            }
-        }
-
-        DB::table('message_log')->insert([
-            'msgl_message' => $messageData['message'],
-            'msgl_number' => json_encode($mainArray),
-            'msgl_date_time' => date('Y-m-d H:i:s'),
-            'user_id' =>$messageData['user_id'],
-            'reseller_id' =>$messageData['reseller_id'],
-            'sms_gateways'=>'psl',
+        DB::table('url_test')->insert([
+            'url'=>$url
         ]);
 
+        $response = Http::withoutVerifying()->get($url);
+        $response = json_decode($response->body(), true);
 
         // $ch = curl_init();
         // curl_setopt($ch, CURLOPT_URL, $url);
@@ -57,13 +39,6 @@ class psl
         // $errors = curl_error($ch);
         // curl_close($ch);
 
-        $responseArray = array();
-        if ($success_count > 0) {
-            $responseArray['status'] = true;
-        } else {
-            $responseArray['status'] = false;
-        }
-
-        return $responseArray;
+        
     }
 }

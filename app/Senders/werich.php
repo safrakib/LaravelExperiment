@@ -36,7 +36,7 @@ class werich
             }
         }
 
-        $response = Http::post($getwayDetails->sg_access_url, [
+        $response = Http::withoutVerifying()->post($getwayDetails->sg_access_url, [
             "api_key" => $getwayDetails->sg_apikey,
             "type" => "text",
             "contacts" => $numbers,
