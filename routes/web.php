@@ -3,6 +3,8 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserAuth;
 use App\Jobs\SmsSender;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\UserRegistration;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -21,7 +23,9 @@ Route::get('/', function () {
     $data['message'] = "Queue Working SMS";
     $data['from'] = 'DLITS';
 
-    SmsSender::dispatch($data);
+    //SmsSender::dispatch($data);
+
+    dispatch(Mail::to('rakib8315@gmail.com')->send(new UserRegistration()));
 
     echo "Sms Send";
 
