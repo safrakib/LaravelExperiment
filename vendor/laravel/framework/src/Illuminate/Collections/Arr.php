@@ -25,7 +25,7 @@ class Arr
      * Add an element to an array using "dot" notation if it doesn't exist.
      *
      * @param  array  $array
-     * @param  string  $key
+     * @param  string|int|float  $key
      * @param  mixed  $value
      * @return array
      */
@@ -424,6 +424,18 @@ class Arr
     }
 
     /**
+     * Key an associative array by a field or using a callback.
+     *
+     * @param  array  $array
+     * @param  callable|array|string
+     * @return array
+     */
+    public static function keyBy($array, $keyBy)
+    {
+        return Collection::make($array)->keyBy($keyBy)->all();
+    }
+
+    /**
      * Get a subset of the items from the given array.
      *
      * @param  array  $array
@@ -587,7 +599,7 @@ class Arr
      * If no key is given to the method, the entire array will be replaced.
      *
      * @param  array  $array
-     * @param  string|null  $key
+     * @param  string|int|null  $key
      * @param  mixed  $value
      * @return array
      */
