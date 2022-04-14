@@ -2,13 +2,15 @@
 
 namespace App\Jobs;
 
+use App\Senders\psl;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldBeUnique;
+use App\Mail\UserRegistration;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Queue\SerializesModels;
-use App\Senders\psl;
+use Illuminate\Contracts\Queue\ShouldBeUnique;
 
 class SmsSender implements ShouldQueue 
 {
@@ -33,6 +35,7 @@ class SmsSender implements ShouldQueue
      */
     public function handle()
     {
-        psl::sendMessage($this->messages);
+        //psl::sendMessage($this->messages);
+        Mail::to('rakib8315@gmail.com')->send(new UserRegistration());
     }
 }
