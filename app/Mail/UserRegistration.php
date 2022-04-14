@@ -4,12 +4,13 @@ namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 
 class UserRegistration extends Mailable
 {
-    use Queueable, SerializesModels;
+    use Queueable, SerializesModels,Dispatchable;
 
     /**
      * Create a new message instance.
