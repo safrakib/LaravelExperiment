@@ -5,6 +5,8 @@ use App\Http\Controllers\UserAuth;
 use App\Jobs\SmsSender;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\UserRegistration;
+use Illuminate\Support\Facades\Artisan;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -37,3 +39,9 @@ Route::get('/', function () {
 
 Route::get('registration',[UserAuth::class,'registration']);
 Route::post('store',[UserAuth::class,'store'])->name('store');
+
+Route::get('listen-queue',function(){
+   // Artisan::call('queue:listen');
+   Artisan::call('queue:work');
+    return "Work listen";
+});
