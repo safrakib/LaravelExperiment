@@ -27,11 +27,11 @@ Route::get('/', function () {
 
     //SmsSender::dispatch($data);
 
-    // dispatch(function () {
-    //     Mail::to('rakib8315@gmail.com')->send(new UserRegistration());
-    // });
+    dispatch(function () {
+        Mail::to('rakib8315@gmail.com')->send(new UserRegistration());
+    });
     //dispatch(Mail::to('rakib8315@gmail.com')->send(new UserRegistration()));
-    Mail::to('rakib8315@gmail.com')->send(new UserRegistration());
+   // Mail::to('rakib8315@gmail.com')->send(new UserRegistration());
 
     echo "Sms Send";
 
