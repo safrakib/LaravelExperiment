@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Post;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserAuth;
 use App\Jobs\SmsSender;
@@ -18,24 +19,27 @@ use Illuminate\Support\Facades\Artisan;
 |
 */
 
-Route::get('/', function () {
-    //return view('welcome');
+// Route::get('/', function () {
+//     //return view('welcome');
 
-    $data['recipient'] = "8801962702977";
-    $data['message'] = "Queue Working SMS";
-    $data['from'] = 'DLITS';
+//     $data['recipient'] = "8801962702977";
+//     $data['message'] = "Queue Working SMS";
+//     $data['from'] = 'DLITS';
 
-    //SmsSender::dispatch($data);
+//     //SmsSender::dispatch($data);
 
-    dispatch(function () {
-        Mail::to('rakib8315@gmail.com')->send(new UserRegistration());
-    });
-    //dispatch(Mail::to('rakib8315@gmail.com')->send(new UserRegistration()));
-   // Mail::to('rakib8315@gmail.com')->send(new UserRegistration());
+//     dispatch(function () {
+//         Mail::to('rakib8315@gmail.com')->send(new UserRegistration());
+//     });
+//     //dispatch(Mail::to('rakib8315@gmail.com')->send(new UserRegistration()));
+//    // Mail::to('rakib8315@gmail.com')->send(new UserRegistration());
 
-    echo "Sms Send";
+//     echo "Sms Send";
 
-});
+// });
+
+Route::get('/',[Post::class,'fileUpload']);
+Route::post('store/pic',[Post::class,'store']);
 
 Route::get('registration',[UserAuth::class,'registration']);
 Route::post('store',[UserAuth::class,'store'])->name('store');
